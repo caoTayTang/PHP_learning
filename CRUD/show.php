@@ -185,8 +185,7 @@
 	<?php 
 	$id = $_GET['id'];
 
-	$connect = mysqli_connect('localhost','root','','j2school');
-	mysqli_set_charset($connect,'utf8');
+	require 'connect.php';
 
 	$sql = "select * from contacts
 	where id = $id";

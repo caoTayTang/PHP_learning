@@ -12,7 +12,7 @@
 			margin:0;
 			padding:0;
 			font-family: sans-serif;
-			background: linear-gradient(#feba9d,#271b95) !important;
+			background: linear-gradient(to right,#feba9d,#271b95) !important;
 		}
 
 		.login-box {
@@ -175,29 +175,39 @@
 	</style>
 </head>
 <body>
+	<?php
+		$id = $_GET['id'];
+		require 'connect.php';
+		$sql = "select * from contacts
+				where id = $id";
+		$return = mysqli_query($connect,$sql);
+		$return = mysqli_fetch_array($return) 
+	 ?>
 	<div class="login-box">
-		<h2>Form Insert</h2>
-		<form action="process_insert.php" method="post" id="my_form">
+		<h2>Form Update</h2>
+		<form action="process_update.php" method="post" id="my_form">
+			<input type="number" name="id" hidden value="<?php echo $return['id']?>">
 			<div class="user-box">
-				<input type="text" name="name" required="">
+				<input type="text" name="name" required="" value="<?php echo  $return['name'] ?>">
 				<label>Name</label>
 			</div>
 			<div class="user-box">
-				<input type="number" name="number" required="">
+				<input type="number" name="number" required="" value="<?php echo  $return['number'] ?>">
 				<label>Phone number</label>
 			</div>
 			<div class="user-box">
-				<input type="text" name="note" required="">
+				<input type="text" name="note" required="" value="<?php echo  $return['note'] ?>">
 				<label>Note</label>
 			</div>
 			<a href="javascript:{}" onclick="document.getElementById('my_form').submit();">
 				<span></span>
 				<span></span>
 				<span></span>
-				<span></span>
-				Submit
+				<span></span> 
+				Update
 			</a>
 		</form>
 	</div>
+	<?php mysqli_close($connect); ?>
 </body>
 </html>

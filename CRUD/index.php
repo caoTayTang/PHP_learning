@@ -12,7 +12,7 @@
 			margin:0;
 			padding:0;
 			font-family: sans-serif;
-			background: linear-gradient(#141e30, #243b55);
+			background: linear-gradient(to right,#feba9d,#271b95) !important;
 		}
 
 		.login-box {
@@ -69,7 +69,23 @@
 			font-size: 12px;
 		}
 
-		.login-box form a {
+		.login-box a {
+			position: relative;
+			display: inline;
+			padding: 10px 20px;
+			color: white;
+			font-size: 16px;
+			text-decoration: none;
+			/*text-transform: uppercase;*/
+			overflow: hidden;
+			transition: .5s;
+			margin-top: 40px;
+			letter-spacing: 4px;
+			z-index: 12;
+		}
+
+		.login-box #kaka a
+		{
 			position: relative;
 			display: inline-block;
 			padding: 10px 20px;
@@ -80,10 +96,12 @@
 			overflow: hidden;
 			transition: .5s;
 			margin-top: 40px;
-			letter-spacing: 4px
+			letter-spacing: 4px;
+			z-index: 12;
 		}
 
-		.login-box a:hover {
+
+		.login-box #kaka a:hover {
 			background: #03e9f4;
 			color: #fff;
 			border-radius: 5px;
@@ -116,7 +134,7 @@
 			}
 		}
 
-		.login-box a span:nth-child(2) {
+		.login-box form a span:nth-child(2) {
 			top: -100%;
 			right: 0;
 			width: 2px;
@@ -182,19 +200,57 @@
 	</style>
 </head>
 <body>
-	<?php 
-	$connect = mysqli_connect('localhost','root','','j2school');
-	mysqli_set_charset($connect,'utf8');
 
-	$sql = "select * from contacts";
+	<?php
+	require 'connect.php';
 
+	// Searching problem
+	$search = "";
+	if ( isset($_GET['search']) ) {
+		$search = $_GET['search'];
+	}
+
+	//Pageing proplem
+	$currentPage = 1;
+
+	if( isset($_GET['page']) )
+	{
+		$currentPage = $_GET['page'];
+	}
+
+	//get numbers of contacts are there
+	$query = "select count(*) from contacts
+			  where name like '%$search%'";
+
+
+	$contact = mysqli_query($connect,$query);
+	$contact = mysqli_fetch_array($contact);
+	$contact = $contact['count(*)'];
+	//Assume that contact per page is 3. So limit = 3
+	$contactPerPages = 3;
+	//Find how many page are there.
+	$pages = ceil($contact/$contactPerPages);
+	//Find offset
+	$offset = ($currentPage-1)*$contactPerPages;
+
+
+	$sql = "select * from contacts
+	where name like '%$search%'
+	LIMIT $offset,$contactPerPages";
 	$return = mysqli_query($connect,$sql);
 
 	?>
 	<div class="login-box">
+		
 		<h2>Your contacts (Overview)</h2>
-		<form action="form_insert.php" method="post" id="my_form">
-			<table width="100%">
+		
+<!-- 		<form action="form_insert.php" method="post" id="my_form">
+ -->			<table width="100%">
+				<caption>
+					<form>
+						<input type="text" name="search" placeholder="Search here">
+					</form>
+				</caption>
 				<tr>
 					<th>
 						<div class="user-box">
@@ -210,20 +266,27 @@
 					</th>
 					<th>
 						<div class="user-box">
-							<input type="number" disabled name="phone_number" required="">
+							<input type="number" disabled name="number" required="">
 							<label>Phone number</label>
 						</div>
 					</th>
 					<th>
 						<div class="user-box">
 							<input type="text" disabled name="note" required="">
-							<label>Note</label>
+							<label>Edit</label>
+						</div>
+					</th>
+
+					<th>
+						<div class="user-box">
+							<input type="text" disabled name="note" required="">
+							<label>Delete</label>
 						</div>
 					</th>
 				</tr>
 
 				<?php foreach($return as $each) {  ?>
-					
+
 					<tr>
 						<td>
 							<a href="show.php?id=<?php echo $each['id'] ?>" style="display:inline ;">
@@ -236,30 +299,54 @@
 							</a>
 						</td>
 						<td>
-							<a href="show.php?id=<?php echo $each['id'] ?>" style="display:inline ;">
+							<a href="show.php?id=<?php echo $each['id']?>" style="display:inline ;">
 								<?php echo $each['number'] ?>
 							</a>
 						</td>
 						<td>
-							<a href="show.php?id=<?php echo $each['id'] ?>" style="display:inline ;">
-								<?php echo $each['note'] ?>
+							<a href="form_update.php?id=<?php echo $each['id']?>" >
+								Update
+							</a>
+						</td>
+						<td>
+							<a href="process_delete.php?id=<?php echo $each['id']?>">
+								Delete
 							</a>
 						</td>
 					</tr>
-					
+
 				<?php } ?>
 			</table>
-			<div style="text-align:center;">
-				<a href="javascript:{}" onclick="document.getElementById('my_form').submit();">
-				<span></span>
-				<span></span>
-				<span></span>
-				<span></span>
-				Insert
-			</a> 
+
+
+			
+			<div style="text-align:center;" id="kaka">
+				<a href="form_insert.php">
+					<!-- href="javascript:{}" onclick="document.getElementById('my_form').submit();" -->
+					<span></span>
+					<span></span>
+					<span></span>
+					<span></span>
+					Insert
+				</a>
 			</div>
 			
-		</form>
+			<br>
+			<p style="color:#fbe542">
+				Pages:
+			</p>
+			<?php for($i = 1; $i <= $pages;$i++ ) {?>
+				<?php 
+					$concatChar = '?';
+					if ( isset($_GET['search']) ) {
+						$concatChar = "?search=$search&";
+					}
+				 ?>
+				<a href="index.php<?php echo $concatChar ?>page=<?php echo $i ?>" style="color: #fbe542;">
+					<?php echo $i ?>
+				</a>
+			<?php } ?>
+		<!-- </form>	 -->
 	</div>
 	<?php mysqli_close($connect); ?>
 </body>
