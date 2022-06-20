@@ -5,6 +5,13 @@
 		</a>
 	</li>
 </ul>
+<ul>
+	<li>
+		<a href="../products">
+			Quản lý sản phậm
+		</a>
+	</li>
+</ul>
 
 <?php 
 if (isset($_GET['error'])) {

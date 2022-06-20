@@ -7,20 +7,22 @@
 </head>
 <body>
 	<?php 
+	//Select by id in ink
 	if (empty($_GET['id'])) {
 		header('Location:index.php?error=Phải truyền id');
 	}
-
 	$id = $_GET['id'];
-
 	require '../menu.php';
 	require '../connect.php';
 
 	$sql = "select * from manufacturers
 			where id = '$id'";
 	$result = mysqli_query($connect,$sql);
-	$each = mysqli_fetch_array($result);
 
+	//Check if theres no record return (id sai)
+	$numberRows = mysqli_num_rows($result);
+	if ( $numberRows === 1) {
+		$each = mysqli_fetch_array($result);
 	 ?>
 	<form action="process_update.php" method="post">
 		<input type="hidden" name="id" value="<?php echo $each['id'] ?>">
@@ -44,7 +46,9 @@
 		<button>Sửa</button>
 		
 	</form>
-
+	<?php } else { ?>
+		<h1>Không tìm thấy theo mã này</h1>
+	<?php } ?>
 	<?php mysqli_close($connect) ?>
 </body>
 </html>
